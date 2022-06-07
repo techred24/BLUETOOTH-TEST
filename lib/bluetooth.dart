@@ -34,9 +34,9 @@ class Indicador {
       .listen((List<BluetoothDevice> dispositivos) {
         for (BluetoothDevice dispositivo in dispositivos) {
           // if (dispositivo.name == _identificador) {
-          if (dispositivo.name == 'Boletera-Apolo') {
+          // if (dispositivo.name == 'Boletera-Apolo') {
             _agregaDispositivoHaciaLista(dispositivo);
-          }
+          // }
         }
       });
       if (dispositivos.length > 0) hayDispositivosConectados = true;
@@ -44,21 +44,28 @@ class Indicador {
   }
 // TODO: Método que buscará y agregará dispositivo a la lista de dispositivos
   void buscaDispositivos() {
+    print('BUSCANDO DISPOSITIVOS');
     flutterBlue.startScan(timeout: Duration(seconds: 3));
     flutterBlue.scanResults.listen((results) async {
+      print(results);
+      print('RESULTADOS');
       for (ScanResult result in results) {
-        if (result.device.name == 'Boletera-Apolo') {
+        print(result);
+        print('RESULTADO');
+        // if (result.device.name == 'Boletera-Apolo') {
           _agregaDispositivoHaciaLista(result.device);
-        }
+        // }
       }
     });
   }
   
   // TODO:  Conectar dispotivo de la lista de dispositivos
   void conectarDispositivo() async {
+    print('${dispositivos.length} LA LOGITUD DEL ARRAY DE DISPOSITIVOS');
     if (dispositivos.length > 0) {
         for (final BluetoothDevice dispositivo in dispositivos) {
           await dispositivo.connect();
+          print('CONECTANDO DISPOSITIVO');
           // services = await dispositivo.discoverServices();
           dispositivoConectado = dispositivo;
           break;
@@ -67,7 +74,8 @@ class Indicador {
   }
 
   void emitirSonido() async {
-    if (!hayErrorEnConexion) {
+    print('DENTRO DE EMITIR SONIDO');
+    // if (!hayErrorEnConexion) {
       List<BluetoothDevice> connectedDevices = [];
       // BluetoothDevice connectedOne;
       flutterBlue.connectedDevices
@@ -98,6 +106,6 @@ class Indicador {
           }
         }
       }
-    }
+    // }
   }
 }

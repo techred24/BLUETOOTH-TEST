@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:bluetooth/bluetooth.dart';
 
 class Fourth extends StatelessWidget {
 
@@ -40,15 +41,15 @@ void displayDialog(BuildContext context) {
             child: Text('Cancelar')
           ),
           TextButton(
-            onPressed: emitir(),
+            onPressed:  ()  {
+                print('onPressed');
+                Indicador indicador = Indicador();
+                indicador.emitirSonido();
+            },
             child: Text('Emitir')
           )
         ],
       );
     }
   );
-}
-
-emitir() {
-  
 }
