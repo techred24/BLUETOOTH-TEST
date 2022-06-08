@@ -11,101 +11,107 @@ class Indicador {
   Indicador._internal();
 
   BluetoothDevice dispositivoConectado;
-  // BluetoothDevice _dispositivo;
   List<BluetoothDevice> dispositivos = [];
-  List<BluetoothDevice> disposivitosConectados = [];
   List<BluetoothService> services = [];
-  String _identificador;
-  bool hayDispositivosConectados = false;
-  bool hayDispositivoConectado = false;
-  bool hayErrorEnConexion = false;
+  // String _identificador;
 
   FlutterBlue flutterBlue = FlutterBlue.instance;
   _agregaDispositivoHaciaLista(final BluetoothDevice device) {
     if (!dispositivos.contains(device)) {
       print('DISPOSITIVO AGREGADO');
       dispositivos.add(device);
+      print(dispositivos.length);
+      print('LONGITUD DE LOS DISPOSITIVOS AL MOMENTO DE AGREGAR');
+      conectarDispositivo();
     }
   }
+  // Se consigue el identificador. El número de la unidad, eje: U-1516
+  // Future<String> _consigueIdentificador() async {
+  //   var prefs = await SharedPreferences.getInstance();
+  //   String datosUnidad = prefs.getString('unidad');
+  //   // _identificador = json.decode(datosUnidad)['identificador'];
+  //   return json.decode(datosUnidad)['identificador'];
+  // }
 // TODO: Método para verificar si ya existen dispositivos conectados
   void buscaDispositivosConectados() {
+    print('DENTRO DE BUSCAR DISPOSITIVOS CONECTADOS');
     flutterBlue.connectedDevices
       .asStream()
       .listen((List<BluetoothDevice> dispositivos) {
+        print(dispositivos);
+        print('LOS DISPOSITIVOS YA CONECTADOS');
         for (BluetoothDevice dispositivo in dispositivos) {
           // if (dispositivo.name == _identificador) {
-          // if (dispositivo.name == 'Boletera-Apolo') {
-            _agregaDispositivoHaciaLista(dispositivo);
-          // }
+            print(dispositivo.name);
+            print('NOMBRE DEL DISPOSITIVO CONECTADO');
+          if (dispositivo.name == 'Boletera-Apolo') {
+            // _agregaDispositivoHaciaLista(dispositivo);
+            dispositivoConectado = dispositivo;
+            print('SE AGREGO EL DISPOSITIVO YA CONECTADO A LA VARIABLE');
+            break;
+          }
         }
       });
-      if (dispositivos.length > 0) hayDispositivosConectados = true;
-      hayDispositivosConectados = false;
   }
 // TODO: Método que buscará y agregará dispositivo a la lista de dispositivos
-  void buscaDispositivos() {
-    print('BUSCANDO DISPOSITIVOS');
+  // Future<List<BluetoothDevice>> buscaDispositivos() async {
+  buscaDispositivos() async {
+    print('METODO PARA BUSCAR DISPOSITIVOS INICIO');
     flutterBlue.startScan(timeout: Duration(seconds: 3));
     flutterBlue.scanResults.listen((results) async {
+      // _identificador = await _consigueIdentificador();
       print(results);
-      print('RESULTADOS');
+      print('LOS DISPOSITIVOS DISPONIBLES PARA CONECTAR');
       for (ScanResult result in results) {
-        print(result);
-        print('RESULTADO');
-        // if (result.device.name == 'Boletera-Apolo') {
+        print(result.device.name);
+        print('NOMBRE DEL DISPOSITIVO A CONECTAR');
+        // if (result.device.name == _identificador) {
+        if (result.device.name == 'Boletera-Apolo') {
           _agregaDispositivoHaciaLista(result.device);
-        // }
+          break;
+        }
       }
     });
+    // flutterBlue.startScan();
+    print('METODO PARA BUSCAR DISPOSITIVOS ANTES DEL RETURN');
   }
   
   // TODO:  Conectar dispotivo de la lista de dispositivos
   void conectarDispositivo() async {
-    print('${dispositivos.length} LA LOGITUD DEL ARRAY DE DISPOSITIVOS');
+    print('METODO PARA CONECTAR DISPOSITIVO INICIO');
+    print(dispositivos.length);
+    print('LA LONGITUD DEL ARRAY DE LOS DISPOSITIVOS');
     if (dispositivos.length > 0) {
+        // flutterBlue.stopScan();
         for (final BluetoothDevice dispositivo in dispositivos) {
           await dispositivo.connect();
-          print('CONECTANDO DISPOSITIVO');
           // services = await dispositivo.discoverServices();
           dispositivoConectado = dispositivo;
+          print(dispositivoConectado);
+          print('EL DISPOSITIVO QUE SE CONECTO');
           break;
         }
     }
+    print('METODO PARA CONECTAR DISPOSITIVO FIN');
   }
 
   void emitirSonido() async {
-    print('DENTRO DE EMITIR SONIDO');
-    // if (!hayErrorEnConexion) {
-      List<BluetoothDevice> connectedDevices = [];
-      // BluetoothDevice connectedOne;
-      flutterBlue.connectedDevices
-        .asStream()
-        .listen((List<BluetoothDevice> dispositivos) {
-            for (BluetoothDevice dispositivo in dispositivos) {
-                // if (dispositivo.name == _identificador) {
-              if (dispositivo.name == 'Boletera-Apolo') {
-                // _agregaDispositivoHaciaLista(dispositivo);
-                if (!connectedDevices.contains(dispositivo)) {
-                  connectedDevices.add(dispositivo);
-                }
-              }
-            }
-        });
-      
-      if (connectedDevices.length > 0) {
-        for (final BluetoothDevice device in connectedDevices) {
-          List<BluetoothService> services = await device.discoverServices();
-          for(final BluetoothService service in services) {
-            List<BluetoothCharacteristic> characteristics = service.characteristics;
-            for (final BluetoothCharacteristic characteristic in characteristics) {
-              if (characteristic.properties.write) {
-                characteristic.write(utf8.encode('1'));
-                break;
-              }
-            }
-          }
+    List<BluetoothService> servicios = await dispositivoConectado.discoverServices();
+    for (final BluetoothService servicio in servicios) {
+      List<BluetoothCharacteristic> caracteristicas =  servicio.characteristics;
+      for (BluetoothCharacteristic caracteristica in caracteristicas) {
+        if (caracteristica.properties.write) {
+          await caracteristica.write(utf8.encode('1'));
+          break;
         }
       }
-    // }
+    }
   }
+
+  void desconectar() {
+    dispositivoConectado.disconnect();
+    dispositivoConectado = null;
+    dispositivos = [];
+  }
+
 }

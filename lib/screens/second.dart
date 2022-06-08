@@ -3,22 +3,28 @@ import 'package:bluetooth/bluetooth.dart';
 
 class Second extends StatelessWidget {
 
+  Indicador indicador = Indicador();
   @override
   Widget build(BuildContext context) {
-    Indicador indicador = Indicador();
-    indicador.buscaDispositivosConectados();
-    if (!indicador.hayDispositivosConectados) {
-      indicador.buscaDispositivos();
-      indicador.conectarDispositivo();
-    }
     return Scaffold(
       appBar: AppBar(
         title: Text('Segunda Pagina')
       ),
       body: Center(
-        child: TextButton(
-          onPressed: () => Navigator.pushNamed(context, 'third'),
-          child: Text('Ir a tercera vista')
+        child: Column(
+          children: [
+            TextButton(
+              onPressed: () => Navigator.pushNamed(context, 'third'),
+              child: Text('Ir a tercera vista')
+            ),
+            TextButton(
+              onPressed: () {
+                indicador.buscaDispositivosConectados();
+                indicador.buscaDispositivos();
+              },
+              child:  Text('CONECTAR A BLUETOOTH')
+            )
+          ]
         )
       ),
     );

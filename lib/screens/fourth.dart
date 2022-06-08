@@ -20,6 +20,7 @@ class Fourth extends StatelessWidget {
 }
 
 void displayDialog(BuildContext context) {
+  Indicador indicador = Indicador();
   showDialog(
     barrierDismissible: false,
     context: context,
@@ -43,8 +44,19 @@ void displayDialog(BuildContext context) {
           TextButton(
             onPressed:  ()  {
                 print('onPressed');
-                Indicador indicador = Indicador();
-                indicador.emitirSonido();
+                if (indicador.dispositivoConectado != null) {
+                  print(indicador.dispositivoConectado.state);
+                  print('EL DISPOSITIVO. ESTADO');
+                  print('INSIDE IF TO ISSUE SOUND');
+                  try {
+                    indicador.emitirSonido();
+                  } catch (e) {
+                    print(e);
+                    print('DENTRO DEL CATCH');
+                  }
+                } else {
+                  print('INSIDE ELSE');
+                }
             },
             child: Text('Emitir')
           )
