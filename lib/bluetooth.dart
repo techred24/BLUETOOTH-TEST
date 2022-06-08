@@ -101,7 +101,11 @@ class Indicador {
       List<BluetoothCharacteristic> caracteristicas =  servicio.characteristics;
       for (BluetoothCharacteristic caracteristica in caracteristicas) {
         if (caracteristica.properties.write) {
-          await caracteristica.write(utf8.encode('1'));
+          try {
+            await caracteristica.write(utf8.encode('1'));
+          } catch (e) {
+            
+          }
           break;
         }
       }

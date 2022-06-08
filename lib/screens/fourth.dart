@@ -48,12 +48,7 @@ void displayDialog(BuildContext context) {
                   print(indicador.dispositivoConectado.state);
                   print('EL DISPOSITIVO. ESTADO');
                   print('INSIDE IF TO ISSUE SOUND');
-                  try {
-                    indicador.emitirSonido();
-                  } catch (e) {
-                    print(e);
-                    print('DENTRO DEL CATCH');
-                  }
+                  indicador.emitirSonido();
                 } else {
                   print('INSIDE ELSE');
                 }
