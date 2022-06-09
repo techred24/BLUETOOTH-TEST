@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bluetooth/bluetooth.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 
 class Fourth extends StatelessWidget {
 
@@ -43,14 +44,14 @@ void displayDialog(BuildContext context) {
           ),
           TextButton(
             onPressed:  ()  {
-                print('onPressed');
                 if (indicador.dispositivoConectado != null) {
-                  print(indicador.dispositivoConectado.state);
-                  print('EL DISPOSITIVO. ESTADO');
-                  print('INSIDE IF TO ISSUE SOUND');
-                  indicador.emitirSonido();
-                } else {
-                  print('INSIDE ELSE');
+                  var suscription;
+                  suscription = indicador.dispositivoConectado.state.listen((event) async {
+                    if (event == BluetoothDeviceState.connected) {
+                      indicador.emitirSonido();
+                      suscription.cancel();
+                    }
+                  });
                 }
             },
             child: Text('Emitir')
